@@ -73,3 +73,21 @@ def create_audio():
     db.session.add(new_audio)
     db.session.commit()
     return jsonify({"message" : "New audio song  created successfully!"})  
+
+#get individual songs
+
+@app.route('/audio/<songName>', methods=['GET'])
+def get_one_audio(songName):
+
+    audio=Audio.query.filter_by(songName=songName).first()
+
+    if not audio:
+        return jsonify({'message' :'No song found with that name'})
+    audio_data={}
+    audio_data['songName']=audio.songName
+    audio_data['artistName']=audio.artistName
+    audio_data['songDuration']=audio.songDuration
+    audio_data['songType']=audio.songType    
+    audio_data['songDescription']=audio.songDescription    
+    audio_data['songQuality']=audio.songQuality    
+    return jsonify({'audio': audio_data})    
