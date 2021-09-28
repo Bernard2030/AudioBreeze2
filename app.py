@@ -37,11 +37,96 @@ class Audio(db.Model):
     songDescription=db.Column(db.String(100))
     songQuality=db.Column(db.String(100))
 
-    # ==============JOE==============#
+# creating routes for all users
+@app.route('/user', methods=['GET'])
+# @token_required  
+def get_all_users():
+    # giving user authentification to update the content
+
+    # if not current_user.admin:
+    #     return jsonify({'message': "You cannot perform that action"})
 
 
+    users = User.query.all()
+    output = []
+    for user in users:
+        user_data ={}
+        user_data['public_id']=user.public_id
+        user_data['name']=user.name
+        user_data['password']=user.password
+        user_data['admin']=user.admin
+        output.append(user_data)
+    return jsonify({'users' : output})
+
+# getting one user at a time
+@app.route('/user/<public_id>', methods=['GET'])
+# @token_required
+def get_one_user(public_id):
+    # giving user authentification to update the content
+
+    # if not current_user.admin:
+    #     return jsonify({'message': "You cannot perform that action"})
+
+    user=User.query.filter_by(public_id=public_id).first()
+
+    if not user:
+        return jsonify({'message' :'No user found with that name'})
+    user_data={}
+    user_data['public_id']=user.public_id
+    user_data['name']=user.name
+    user_data['password']=user.password
+    user_data['admin']=user.admin    
+    return jsonify({'user': user_data})
+
+# Create user here
+@app.route('/user/', methods=['POST'])
+# @token_required
+def create_user():
+    # giving user authentification to update the content
+
+    # if not current_user.admin:
+    #     return jsonify({'message': "You cannot perform that action"})
+    data=request.get_json()
+    hashed_password=generate_password_hash(data['password'], method='sha256')
+    new_user=User(public_id=str(uuid.uuid4()), name=data['name'], password=hashed_password, admin=False)
+    db.session.add(new_user)
+    db.session.commit()
+    return jsonify({"message" : "New user created successfully!"})
+
+# put user 
+@app.route('/user/<public_id>', methods=['PUT'])
+# @token_required
+def promote_user(public_id):
+    # giving user authentification to update the content
+
+    # if not current_user.admin:
+    #     return jsonify({'message': "You cannot perform that action"})
+    user=User.query.filter_by(public_id=public_id).first()
+
+    if not user:
+        return jsonify({'message' :'No user found'})
+    user.admin=True
+    db.session.commit()   
+    return jsonify({'message': 'The user has been promoted1 to Admin'})
 
 
+    #delete method
+@app.route('/user/<public_id>', methods=['DELETE'])  
+# @token_required
+def delete_user( public_id):
+    # giving user authentification to update the content
+
+    # if not current_user.admin:
+    #     return jsonify({'message': "You cannot perform that action"})
+    user=User.query.filter_by(public_id=public_id).first()
+
+    if not user:
+        return jsonify({'message' :'No user found'})
+    db.session.delete(user)
+    db.session.commit()
+    return jsonify({'message': 'User deleted successfully'})  
+
+    
     #================JOE END =========#
 
     ##======Bernard=========##
