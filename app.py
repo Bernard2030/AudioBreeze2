@@ -90,4 +90,16 @@ def get_one_audio(songName):
     audio_data['songType']=audio.songType    
     audio_data['songDescription']=audio.songDescription    
     audio_data['songQuality']=audio.songQuality    
-    return jsonify({'audio': audio_data})    
+    return jsonify({'audio': audio_data}) 
+
+    ## put a song here
+
+@app.route('/audio/<songName>', methods=['PUT'])
+def promote_song(songName):
+    audio=Audio.query.filter_by(songName=songName).first()
+
+    if not audio:
+        return jsonify({'message' :'No song found'})
+    audio.admin=True
+    db.session.commit()   
+    return jsonify({'message': 'The song has been promoted to be the most trending song '})      
