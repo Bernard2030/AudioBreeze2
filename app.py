@@ -109,7 +109,7 @@ def promote_user(public_id):
     db.session.commit()   
     return jsonify({'message': 'The user has been promoted1 to Admin'})
 
-    
+
     #delete method
 @app.route('/user/<public_id>', methods=['DELETE'])  
 # @token_required
@@ -125,6 +125,25 @@ def delete_user( public_id):
     db.session.delete(user)
     db.session.commit()
     return jsonify({'message': 'User deleted successfully'})  
+
+# =============authentication goes here for the user===========================
+@app.route('/login')
+def login():
+    auth=request.authorization
+
+    if not auth or not auth.username or not auth.password:
+        return make_response('Could not verify', 401, {'WWW-Authenticate' : 'Basic realm="Login Required"'})
+    user=User.query.filter_by(name=auth.username).first()
+
+    if not user:
+        return make_response('Could not verify', 401, {'WWW-Authenticate' : 'Basic realm="Login Required"'})
+    if check_password_hash(user.password, auth.password):
+        token= jwt.encode({'public_id' : user.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=20)}, app.config['SECRET_KEY'])
+
+        return jsonify({'token': token})
+
+    return make_response('Could not verify', 401, {'WWW-Authenticate' : 'Basic realm="Login Required"'})
+   
     #================JOE END =========#
 
     ##======Bernard=========##
