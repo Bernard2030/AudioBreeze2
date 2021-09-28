@@ -36,3 +36,30 @@ class Audio(db.Model):
     songType=db.Column(db.String(50))
     songDescription=db.Column(db.String(100))
     songQuality=db.Column(db.String(100))
+
+    # ==============JOE==============#
+
+
+
+
+    #================JOE END =========#
+
+    ##======Bernard=========##
+    ##======Routes=========##
+
+    #get all audio approute
+
+@app.route('/audio', methods=['GET'])
+def get_all_audios():
+    audios = Audio.query.all()
+    output = []
+    for audio in audios:
+        audio_data ={}
+        audio_data['songName']=audio.songName
+        audio_data['artistName']=audio.artistName
+        audio_data['songDuration']=audio.songDuration
+        audio_data['songType']=audio.songType
+        audio_data['songDescription']=audio.songDescription
+        audio_data['songQuality']=audio.songQuality
+        output.append(audio_data)
+    return jsonify({'audios' : output})
