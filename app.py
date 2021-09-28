@@ -63,3 +63,13 @@ def get_all_audios():
         audio_data['songQuality']=audio.songQuality
         output.append(audio_data)
     return jsonify({'audios' : output})
+
+#3create individual soings in the database
+
+@app.route('/audio/', methods=['POST'])
+def create_audio():
+    data=request.get_json()    
+    new_audio=Audio(songName=data['songName'], artistName=data['artistName'],songDuration=data['songDuration'], songType=data['songType'], songDescription=data['songDescription'], songQuality=data['songQuality'])
+    db.session.add(new_audio)
+    db.session.commit()
+    return jsonify({"message" : "New audio song  created successfully!"})  
