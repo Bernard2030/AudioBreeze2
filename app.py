@@ -40,11 +40,11 @@ class Audio(db.Model):
 # creating routes for all users
 @app.route('/user', methods=['GET'])
 # @token_required  
-def get_all_users(current_user):
+def get_all_users():
     # giving user authentification to update the content
 
-    if not current_user.admin:
-        return jsonify({'message': "You cannot perform that action"})
+    # if not current_user.admin:
+    #     return jsonify({'message': "You cannot perform that action"})
 
 
     users = User.query.all()
@@ -61,11 +61,11 @@ def get_all_users(current_user):
 # getting one user at a time
 @app.route('/user/<public_id>', methods=['GET'])
 # @token_required
-def get_one_user(current_user, public_id):
+def get_one_user(public_id):
     # giving user authentification to update the content
 
-    if not current_user.admin:
-        return jsonify({'message': "You cannot perform that action"})
+    # if not current_user.admin:
+    #     return jsonify({'message': "You cannot perform that action"})
 
     user=User.query.filter_by(public_id=public_id).first()
 
@@ -77,28 +77,6 @@ def get_one_user(current_user, public_id):
     user_data['password']=user.password
     user_data['admin']=user.admin    
     return jsonify({'user': user_data})
-
-def token_required(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        token = None
-
-        if 'x-access-token' in request.headers:
-            token=request.headers['x-access-token']
-
-        if not token:
-            return jsonify({'message' : 'Token is missing for authentication'}), 401
-
-
-        # if token is there 
-        try:
-            data =jwt(token, app.config['SECRET_KEY']) 
-            current_user =User.query.filter_by(public_id=data['public_id']).first()
-        except:
-            return jsonify({'message': 'Token is invalid!'}), 401
-
-        return  f(current_user, *args , **kwargs)  
-    return decorated         
 
 # Create user here
 @app.route('/user/', methods=['POST'])
@@ -148,24 +126,7 @@ def delete_user( public_id):
     db.session.commit()
     return jsonify({'message': 'User deleted successfully'})  
 
-# =============authentication goes here for the user===========================
-@app.route('/login')
-def login():
-    auth=request.authorization
-
-    if not auth or not auth.username or not auth.password:
-        return make_response('Could not verify', 401, {'WWW-Authenticate' : 'Basic realm="Login Required"'})
-    user=User.query.filter_by(name=auth.username).first()
-
-    if not user:
-        return make_response('Could not verify', 401, {'WWW-Authenticate' : 'Basic realm="Login Required"'})
-    if check_password_hash(user.password, auth.password):
-        token= jwt.encode({'public_id' : user.public_id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=20)}, app.config['SECRET_KEY'])
-
-        return jsonify({'token': token})
-
-    return make_response('Could not verify', 401, {'WWW-Authenticate' : 'Basic realm="Login Required"'})
-   
+    
     #================JOE END =========#
 
     ##======Bernard=========##
