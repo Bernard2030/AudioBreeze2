@@ -40,11 +40,11 @@ class Audio(db.Model):
 # creating routes for all users
 @app.route('/user', methods=['GET'])
 # @token_required  
-def get_all_users():
+def get_all_users(current_user):
     # giving user authentification to update the content
 
-    # if not current_user.admin:
-    #     return jsonify({'message': "You cannot perform that action"})
+    if not current_user.admin:
+        return jsonify({'message': "You cannot perform that action"})
 
 
     users = User.query.all()
@@ -61,11 +61,11 @@ def get_all_users():
 # getting one user at a time
 @app.route('/user/<public_id>', methods=['GET'])
 # @token_required
-def get_one_user(public_id):
+def get_one_user(current_user, public_id):
     # giving user authentification to update the content
 
-    # if not current_user.admin:
-    #     return jsonify({'message': "You cannot perform that action"})
+    if not current_user.admin:
+        return jsonify({'message': "You cannot perform that action"})
 
     user=User.query.filter_by(public_id=public_id).first()
 
