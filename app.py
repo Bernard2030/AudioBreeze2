@@ -37,7 +37,26 @@ class Audio(db.Model):
     songDescription=db.Column(db.String(100))
     songQuality=db.Column(db.String(100))
 
-    # ==============JOE==============#
+# creating routes for all users
+@app.route('/user', methods=['GET'])
+# @token_required  
+def get_all_users():
+    # giving user authentification to update the content
+
+    # if not current_user.admin:
+    #     return jsonify({'message': "You cannot perform that action"})
+
+
+    users = User.query.all()
+    output = []
+    for user in users:
+        user_data ={}
+        user_data['public_id']=user.public_id
+        user_data['name']=user.name
+        user_data['password']=user.password
+        user_data['admin']=user.admin
+        output.append(user_data)
+    return jsonify({'users' : output})
 
 
 
