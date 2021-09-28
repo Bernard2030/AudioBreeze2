@@ -114,4 +114,8 @@ def delete_song(songName):
         return jsonify({'message' :'No song  found'})
     db.session.delete(audio)
     db.session.commit()
-    return jsonify({'message': 'The song has been deleted successfully'})         
+    return jsonify({'message': 'The song has been deleted successfully'})  
+
+#run the application
+if __name__ == '__main__':
+    app.run()           
