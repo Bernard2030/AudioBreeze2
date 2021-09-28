@@ -102,4 +102,16 @@ def promote_song(songName):
         return jsonify({'message' :'No song found'})
     audio.admin=True
     db.session.commit()   
-    return jsonify({'message': 'The song has been promoted to be the most trending song '})      
+    return jsonify({'message': 'The song has been promoted to be the most trending song '}) 
+
+#delete the song audio
+
+@app.route('/audio/<songName>', methods=['DELETE'])  
+def delete_song(songName):
+    audio=Audio.query.filter_by(songName=songName).first()
+
+    if not audio:
+        return jsonify({'message' :'No song  found'})
+    db.session.delete(audio)
+    db.session.commit()
+    return jsonify({'message': 'The song has been deleted successfully'})         
