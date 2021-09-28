@@ -78,6 +78,28 @@ def get_one_user(public_id):
     user_data['admin']=user.admin    
     return jsonify({'user': user_data})
 
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+
+        if 'x-access-token' in request.headers:
+            token=request.headers['x-access-token']
+
+        if not token:
+            return jsonify({'message' : 'Token is missing for authentication'}), 401
+
+
+        # if token is there 
+        try:
+            data =jwt(token, app.config['SECRET_KEY']) 
+            current_user =User.query.filter_by(public_id=data['public_id']).first()
+        except:
+            return jsonify({'message': 'Token is invalid!'}), 401
+
+        return  f(current_user, *args , **kwargs)  
+    return decorated         
+
 # Create user here
 @app.route('/user/', methods=['POST'])
 # @token_required
