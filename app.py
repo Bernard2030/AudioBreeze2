@@ -108,7 +108,23 @@ def promote_user(public_id):
     user.admin=True
     db.session.commit()   
     return jsonify({'message': 'The user has been promoted1 to Admin'})
-    #delete user 
+
+    
+    #delete method
+@app.route('/user/<public_id>', methods=['DELETE'])  
+# @token_required
+def delete_user( public_id):
+    # giving user authentification to update the content
+
+    # if not current_user.admin:
+    #     return jsonify({'message': "You cannot perform that action"})
+    user=User.query.filter_by(public_id=public_id).first()
+
+    if not user:
+        return jsonify({'message' :'No user found'})
+    db.session.delete(user)
+    db.session.commit()
+    return jsonify({'message': 'User deleted successfully'})  
     #================JOE END =========#
 
     ##======Bernard=========##
