@@ -1,4 +1,5 @@
 # imports 
+from flask import create_app
 import jwt 
 from flask import Flask,jsonify,request,make_response
 from flask.helpers import make_response
@@ -10,6 +11,8 @@ from functools import wraps
 
 
 # initializing the application
+
+app = create_app('production')
 
 app=Flask(__name__)
 
